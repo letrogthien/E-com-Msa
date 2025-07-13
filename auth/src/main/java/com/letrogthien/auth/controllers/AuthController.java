@@ -1,7 +1,9 @@
 package com.letrogthien.auth.controllers;
 
 
+import com.letrogthien.auth.common.RoleName;
 import com.letrogthien.auth.services.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import com.letrogthien.auth.anotation.JwtClaims;
@@ -17,12 +19,9 @@ import com.letrogthien.auth.requests.TrustDeviceRequest;
 import com.letrogthien.auth.requests.Verify2FaRequest;
 import com.letrogthien.auth.responses.ApiResponse;
 import com.letrogthien.auth.responses.LoginResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping({"/api/v1/auth"})
@@ -36,8 +35,8 @@ public class AuthController {
     }
 
     @PostMapping({"/login"})
-    public ApiResponse<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        return this.authService.login(loginRequest);
+    public ApiResponse<LoginResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        return this.authService.login(loginRequest, response);
     }
 
     @PostMapping({"/logout"})
@@ -66,8 +65,8 @@ public class AuthController {
     }
 
     @PostMapping({"/reset-password"})
-    public ApiResponse<String> resetPassword(@RequestBody @Valid ResetPwdRequest resetPwdRequest) {
-        return this.authService.resetPassword(resetPwdRequest);
+    public ApiResponse<String> resetPassword(@RequestBody @Valid ResetPwdRequest resetPwdRequest, @RequestParam String token) {
+        return this.authService.resetPassword(resetPwdRequest, token);
     }
 
     @PostMapping({"/enable-2fa"})
@@ -81,8 +80,8 @@ public class AuthController {
     }
 
     @PostMapping({"/verify-2fa"})
-    public ApiResponse<LoginResponse> verifyTwoFAuth(@RequestBody Verify2FaRequest verify2FaRequest) {
-        return this.authService.verifyTwoFAuth(verify2FaRequest);
+    public ApiResponse<LoginResponse> verifyTwoFAuth(@RequestBody Verify2FaRequest verify2FaRequest, HttpServletResponse response) {
+        return this.authService.verifyTwoFAuth(verify2FaRequest , response);
     }
 
     @PostMapping({"/trust-device"})
@@ -95,5 +94,21 @@ public class AuthController {
         return this.authService.activateAccount(token);
     }
 
+    @PostMapping({"/role/assign"})
+    public ApiResponse<String> assignRoleToUser(@JwtClaims("id") UUID userId, @RequestParam RoleName roleName) {
+        return this.authService.assignRoleToUser(userId, roleName);
+    }
 
+    @GetMapping({"/test"})
+    public ApiResponse<String> test() {
+        return ApiResponse.<String>builder()
+                .message("Test successful")
+                .build();
+    }
+    @GetMapping({"/test-authenticated"})
+    public ApiResponse<String> testAuthenticated(@JwtClaims("id") UUID userId) {
+        return ApiResponse.<String>builder()
+                .message("Authenticated user ID: " + userId)
+                .build();
+    }
 }
