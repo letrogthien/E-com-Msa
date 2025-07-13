@@ -1,0 +1,33 @@
+{
+  "namespace": "com.letrogthien.common.event",
+  "type": "record",
+  "name": "ApprovedKycEvent",
+  "fields": [
+    {
+      "name": "id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "userId",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "documentFrontUrl",
+      "type": "string"
+    },
+    {
+      "name": "documentBackUrl",
+      "type": "string"
+    },
+    {
+      "name": "version",
+      "type": "int"
+    }
+  ]
+}
