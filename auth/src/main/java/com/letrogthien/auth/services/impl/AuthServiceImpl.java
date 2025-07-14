@@ -36,6 +36,7 @@ import com.letrogthien.auth.responses.LoginResponse;
 import com.letrogthien.auth.securities.CustomPasswordEncoder;
 import com.letrogthien.auth.services.AuthService;
 import com.letrogthien.common.event.OtpEvent;
+import com.letrogthien.common.event.PasswordResetEvent;
 import com.letrogthien.common.event.StrangeDevice;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -346,9 +347,15 @@ public class AuthServiceImpl implements AuthService {
         String token = this.jwtUtils.generateResetPasswordToken(user);
         String var10000 = ConstString.DOMAIN_NAME.getValue();
         String url = var10000 + "reset-password?token=" + token;
+        eventProducer.forgotPassword(
+                PasswordResetEvent.newBuilder()
+                        .setEmail(email)
+                        .setResetUrl(url)
+                        .build()
+        );
         return ApiResponse.<String>builder()
                 .message("Forgot password request successful, please check your email")
-                .data(url)
+                .data("success")
                 .build();
     }
 

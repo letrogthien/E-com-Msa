@@ -3,6 +3,7 @@ package com.letrogthien.auth.services.outbox;
 import com.letrogthien.auth.common.Status;
 import com.letrogthien.auth.entities.RegisterOutBox;
 import com.letrogthien.auth.kafka.EventProducer;
+import com.letrogthien.auth.repositories.MessageErrorRepository;
 import com.letrogthien.auth.repositories.RegisterOutBoxRepository;
 import com.letrogthien.common.event.RegistrationEvent;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OutBoxSchedule {
     private final RegisterOutBoxRepository registerOutBoxRepository;
+    private final MessageErrorRepository messageErrorRepository;
     private final EventProducer eventProducer;
 
 
@@ -46,5 +48,7 @@ public class OutBoxSchedule {
             registerOutBoxRepository.save(message);
         }
     }
+
+
 
 }
