@@ -1,20 +1,8 @@
 package com.letrogthien.auth.entities;
 
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -22,16 +10,15 @@ import java.util.List;
 import java.util.UUID;
 
 import com.letrogthien.auth.common.Status;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(
         name = "users"
 )
-@Data
+@ToString(exclude = {"roles", "loginHistories"})
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -61,6 +48,7 @@ public class User {
             length = 255
     )
     private String passwordHash;
+    @Enumerated(EnumType.STRING)
     @Column(
             name = "status",
             nullable = false,
@@ -71,6 +59,10 @@ public class User {
             name = "two_factor_enabled"
     )
     private boolean twoFactorEnabled = false;
+    @Column(
+            name = "is_kyc"
+    )
+    private boolean kyc = false;
     @Column(
             name = "created_at",
             nullable = false
@@ -100,22 +92,12 @@ public class User {
     private List<Role> roles = new ArrayList<>();
     @OneToMany(
             mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<KycDocument> kycDocuments = new ArrayList<>();
-    @OneToMany(
-            mappedBy = "user",
             cascade = {CascadeType.ALL},
-            orphanRemoval = true
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
     )
+    @JsonManagedReference
     private List<LoginHistory> loginHistories = new ArrayList<>();
-    @OneToMany(
-            mappedBy = "user",
-            cascade = {CascadeType.ALL},
-            orphanRemoval = true
-    )
-    private List<AuditLog> auditLogs;
 
     @PreUpdate
     private void onUpdate() {
@@ -129,9 +111,7 @@ public class User {
         this.lastLoginAt = ZonedDateTime.now();
         this.status = Status.PENDING;
         this.twoFactorEnabled = false;
+        this.kyc = false;
     }
 
-    public void updateLastLogin() {
-        this.lastLoginAt = ZonedDateTime.now();
-    }
 }

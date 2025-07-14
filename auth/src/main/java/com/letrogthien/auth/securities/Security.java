@@ -2,6 +2,7 @@ package com.letrogthien.auth.securities;
 
 
 
+import com.letrogthien.auth.common.RoleName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ public class Security {
     private final CustomJwtDecoder jwtDecoder;
     private final CustomAuthenticatinConverter converter;
     private final CustomAuthenticationEntryPoint entryPoint;
+    private final GetTokenResolver getTokenResolver;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
@@ -39,8 +41,11 @@ public class Security {
                             "/api/v1/user/**",
                             "/swagger-ui/**",
                             "/v3/api-docs/**",
-                            "/api/v1/auth/activate"
+                            "/api/v1/auth/activate",
+                            "/api/v1/auth/test"
                     ).permitAll()
+                    .requestMatchers("/api/admin/**").hasAuthority(RoleName.ROLE_ADMIN.name())
+                    .requestMatchers("/api/v1/auth/test-authenticated").hasAuthority(RoleName.ROLE_USER.name())
                     .anyRequest().authenticated()
         );
     }
@@ -55,6 +60,7 @@ public class Security {
                         .decoder(jwtDecoder)
                         .jwtAuthenticationConverter(converter)
                 )
+                .bearerTokenResolver(getTokenResolver)
                 .authenticationEntryPoint(entryPoint)
         );
     }

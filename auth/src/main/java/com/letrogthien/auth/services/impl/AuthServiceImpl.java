@@ -1,19 +1,18 @@
 package com.letrogthien.auth.services.impl;
 
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.letrogthien.auth.anotation.CusAuditable;
 import com.letrogthien.auth.common.ConstString;
 import com.letrogthien.auth.common.RoleName;
 import com.letrogthien.auth.common.Status;
 import com.letrogthien.auth.common.TokenType;
-import com.letrogthien.auth.entities.DeviceInformation;
-import com.letrogthien.auth.entities.PasswordHistory;
-import com.letrogthien.auth.entities.Role;
-import com.letrogthien.auth.entities.User;
-import com.letrogthien.auth.entities.WhiteList;
+import com.letrogthien.auth.entities.*;
 import com.letrogthien.auth.exceptions.CustomException;
 import com.letrogthien.auth.exceptions.ErrorCode;
 import com.letrogthien.auth.jwt.JwtUtils;
@@ -22,10 +21,7 @@ import com.letrogthien.auth.otp.OtpModel;
 import com.letrogthien.auth.otp.OtpType;
 import com.letrogthien.auth.redis.services.OtpModelCacheService;
 import com.letrogthien.auth.redis.services.WhiteListCacheService;
-import com.letrogthien.auth.repositories.DeviceInformationRepository;
-import com.letrogthien.auth.repositories.PasswordHistoryRepository;
-import com.letrogthien.auth.repositories.RoleRepository;
-import com.letrogthien.auth.repositories.UserRepository;
+import com.letrogthien.auth.repositories.*;
 import com.letrogthien.auth.requests.AccessTokenRequest;
 import com.letrogthien.auth.requests.ChangePwdRequest;
 import com.letrogthien.auth.requests.Disable2FaRequest;
@@ -40,8 +36,9 @@ import com.letrogthien.auth.responses.LoginResponse;
 import com.letrogthien.auth.securities.CustomPasswordEncoder;
 import com.letrogthien.auth.services.AuthService;
 import com.letrogthien.common.event.OtpEvent;
-import com.letrogthien.common.event.RegistrationEvent;
 import com.letrogthien.common.event.StrangeDevice;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,8 +55,11 @@ public class AuthServiceImpl implements AuthService {
     private final EventProducer eventProducer;
     private final PasswordHistoryRepository passwordHistoryRepository;
     private final DeviceInformationRepository deviceInformationRepository;
+    private final RegisterOutBoxRepository registerOutBoxRepository;
+
 
     @Override
+    @Transactional
     public ApiResponse<String> register(RegisterRequest registerRequest) {
         String responseData = "";
         if (this.existUsername(registerRequest.getUsername())) {
@@ -86,12 +86,11 @@ public class AuthServiceImpl implements AuthService {
         user.setRoles(List.of(defaultRole));
         this.userRepository.save(user);
 
-        RegistrationEvent registrationEvent = this.generateRegistrationEvent(user);
-        this.eventProducer.registerUser(registrationEvent);
+        this.generateRegistrationEventOutBox(user);
 
         return ApiResponse.<String>builder()
                 .message("Registration successful, please check your email to activate your account")
-                .data("Registration successful")
+                .data("Registration")
                 .build();
 
     }
@@ -104,16 +103,24 @@ public class AuthServiceImpl implements AuthService {
         return this.userRepository.existsByEmail(email);
     }
 
-    private RegistrationEvent generateRegistrationEvent(User user) {
+    private void generateRegistrationEventOutBox(User user) {
         String var10000 = ConstString.DOMAIN_NAME.getValue();
+
         String url = var10000 + "activate?token=" + this.jwtUtils.generateActivationToken(user);
-        return RegistrationEvent.newBuilder().setEmail(user.getEmail()).setUrlActivation(url).build();
+        RegisterOutBox registerOutBox = RegisterOutBox.builder()
+                .email(user.getEmail())
+                .userId(user.getId())
+                .urlActivation(url)
+                .createdAt(LocalDateTime.now())
+                .status(Status.PENDING)
+                .build();
+        registerOutBoxRepository.save(registerOutBox);
     }
 
     @Override
     @Transactional
-    public ApiResponse<LoginResponse> login(LoginRequest loginRequest) {
-        User user = this.userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() ->
+    public ApiResponse<LoginResponse> login(LoginRequest loginRequest, HttpServletResponse response) {
+        User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() ->
                 new CustomException(ErrorCode.USER_NOT_FOUND)
         );
         if (user.getStatus() != Status.ACTIVE) {
@@ -131,10 +138,9 @@ public class AuthServiceImpl implements AuthService {
         if (user.isTwoFactorEnabled()) {
             return this.handlerTwoFAuth(user);
         }
-        user.updateLastLogin();
-        this.userRepository.save(user);
-        return this.generateLoginResponse(user);
-
+        user.setLastLoginAt(ZonedDateTime.now());
+        userRepository.save(user);
+        return this.generateLoginResponse(user, response);
 
     }
 
@@ -155,13 +161,7 @@ public class AuthServiceImpl implements AuthService {
         if (isTrust.get()) {
             return;
         }
-        DeviceInformation deviceInformation = new DeviceInformation();
-        deviceInformation.setUserId(user.getId());
-        deviceInformation.setDeviceName(deviceName);
-        deviceInformation.setDeviceType(deviceTpe);
-        deviceInformation.setLastLoginAt(ZonedDateTime.now());
-        deviceInformation.setCreatedAt(ZonedDateTime.now());
-        this.deviceInformationRepository.save(deviceInformation);
+        newDeviceInformation(deviceName, deviceTpe, user);
         this.eventProducer.strangeDevice(
                 StrangeDevice.newBuilder()
                         .setEmail(user.getEmail())
@@ -171,16 +171,28 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
-    private ApiResponse<LoginResponse> generateLoginResponse(User user) {
+    private ApiResponse<LoginResponse> generateLoginResponse(User user, HttpServletResponse response) {
         String token = this.jwtUtils.generateToken(user);
         String refreshToken = this.jwtUtils.generateRefreshToken(user);
         String jti = this.jwtUtils.extractClaim(refreshToken, "jti");
         this.whiteListCacheService.saveToCache(new WhiteList(jti, user.getId()));
+
+        Cookie cookie = new  Cookie("access_token", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setMaxAge(3600000);
+        response.addCookie(cookie);
+
+        Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(604800000);
+        response.addCookie(refreshTokenCookie);
         return ApiResponse.<LoginResponse>builder()
                 .message("Login successful")
                 .data(LoginResponse.builder()
-                        .accessToken(token)
-                        .refreshToken(refreshToken)
                         .build())
                 .build();
     }
@@ -208,7 +220,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ApiResponse<LoginResponse> verifyTwoFAuth(Verify2FaRequest verify2FaRequest) {
+    public ApiResponse<LoginResponse> verifyTwoFAuth(Verify2FaRequest verify2FaRequest, HttpServletResponse response) {
         String secret = verify2FaRequest.getSecret();
         if (!this.jwtUtils.isTokenValid(secret, TokenType.TMP_TOKEN)) {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
@@ -224,7 +236,7 @@ public class AuthServiceImpl implements AuthService {
         User user = this.userRepository.findById(userId).orElseThrow(() ->
                 new CustomException(ErrorCode.USER_NOT_FOUND)
         );
-        return this.generateLoginResponse(user);
+        return this.generateLoginResponse(user, response );
 
 
     }
@@ -277,10 +289,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @CusAuditable(action = "Change Password", description = "User changes their password")
     public ApiResponse<String> changePassword(ChangePwdRequest changePwdRequest, UUID userId) {
         User user = this.userRepository.findById(userId).orElseThrow(() ->
                 new CustomException(ErrorCode.USER_NOT_FOUND)
         );
+        System.out.println("User found: " + user.getUsername());
         this.validateChangePasswordRequest(changePwdRequest, user.getPasswordHash(), userId);
         String newPassword = changePwdRequest.getNewPassword();
         user.setPasswordHash(this.passwordEncoder.passwordEncoder().encode(newPassword));
@@ -357,6 +371,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
+    @CusAuditable(action = "Disable 2FA", description = "User disables two-factor authentication")
     public ApiResponse<String> disableTwoFAuth(Disable2FaRequest disable2FAuthRequest, UUID userId) {
 
         boolean isValid = otpModelCacheService.isPresentAndValidInCache(
@@ -382,9 +397,26 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @CusAuditable(action = "Trust Device", description = "User trusts a device for future logins")
     public ApiResponse<String> trustDevice(String deviceName, String deviceType, UUID userId) {
+        User user = this.userRepository.findById(userId).orElseThrow(() ->
+                new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        newDeviceInformation(deviceName, deviceType, user);
+        return ApiResponse.<String>builder()
+                .message("Device trusted successfully")
+                .data("Device trusted successfully")
+                .build();
+    }
 
-        return null;
+    private void newDeviceInformation(String deviceName, String deviceType, User user) {
+        DeviceInformation deviceInformation = new DeviceInformation();
+        deviceInformation.setUser(user);
+        deviceInformation.setDeviceName(deviceName);
+        deviceInformation.setDeviceType(deviceType);
+        deviceInformation.setLastLoginAt(ZonedDateTime.now());
+        deviceInformation.setCreatedAt(ZonedDateTime.now());
+        this.deviceInformationRepository.save(deviceInformation);
     }
 
     @Override
@@ -410,8 +442,60 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ApiResponse<String> resetPassword(ResetPwdRequest resetPwdRequest) {
-        return null;
+    public ApiResponse<String> resetPassword(ResetPwdRequest resetPwdRequest, String token) {
+        if (!this.jwtUtils.isTokenValid(token, TokenType.PASSWORD_RESET_TOKEN)) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+        UUID userId = UUID.fromString(this.jwtUtils.extractClaim(token, "id"));
+        User user = this.userRepository.findById(userId).orElseThrow(() ->
+                new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        String newPassword = resetPwdRequest.getNewPassword();
+        String confirmPassword = resetPwdRequest.getConfirmPassword();
+        if (!newPassword.equals(confirmPassword)) {
+            throw new CustomException(ErrorCode.PASSWORDS_DO_NOT_MATCH);
+        }
+        user.setPasswordHash(this.passwordEncoder.passwordEncoder().encode(newPassword));
+        this.userRepository.save(user);
+        return ApiResponse.<String>builder()
+                .message("Password reset successfully")
+                .data("Password reset successfully")
+                .build();
     }
 
+    @Override
+    public ApiResponse<String> assignRoleToUser(UUID userId, RoleName roleName) {
+        return assignRoleHelper(
+                this.userRepository.findById(userId).orElseThrow(() ->
+                        new CustomException(ErrorCode.USER_NOT_FOUND)
+                ),
+                roleName
+        );
+    }
+
+    private ApiResponse<String> assignRoleHelper(User user, RoleName roleName) {
+        Role role = this.roleRepository.findByName(roleName).orElseThrow(() ->
+                new CustomException(ErrorCode.NOT_FOUND)
+        );
+        if (user.getRoles().contains(role)) {
+            throw new CustomException(ErrorCode.INVALID_INPUT);
+        }
+
+        switch (roleName) {
+            case ROLE_SELLER:
+                if (!user.isKyc()) {
+                    throw new CustomException(ErrorCode.ACCESS_DENIED);
+                }
+                break;
+
+            default:
+                break;
+        }
+        user.getRoles().add(role);
+        this.userRepository.save(user);
+        return ApiResponse.<String>builder()
+                .message("Role " + roleName + " assigned to user successfully")
+                .data("Role " + roleName + " assigned to user successfully")
+                .build();
+    }
 }
