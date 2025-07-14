@@ -22,13 +22,11 @@ public class SendEvent {
         CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(topic, event);
         future.whenComplete((SendResult<String, Object> result, Throwable ex) -> {
             if (ex != null) {
-                System.err.println("Error sending event to Kafka: " + ex.getMessage());
+                String message = (event != null) ? event.toString() : "null";
                 messageErrorRepository.save(SendMessageError.builder()
-                        .message(result.getProducerRecord().value().toString())
-                        .topic(result.getProducerRecord().topic())
+                        .message(message)
+                        .topic(topic)
                         .build());
-            } else {
-                System.out.println("Event sent successfully to topic: " + topic);
             }
         });
     }

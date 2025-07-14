@@ -1,5 +1,6 @@
 package com.letrogthien.auth.entities;
 
+import com.letrogthien.auth.common.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,6 +18,7 @@ public class SendMessageError {
 
     @Id
     @Column(columnDefinition = "binary(16)")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false, length = 255)
@@ -26,7 +28,8 @@ public class SendMessageError {
     private String message;
 
     @Column(nullable = false, length = 50)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -34,7 +37,7 @@ public class SendMessageError {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        this.id = UUID.randomUUID();
+        this.status = Status.PENDING;
     }
 
 }
