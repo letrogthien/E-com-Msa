@@ -41,9 +41,8 @@ public class CustomJwtDecoder implements JwtDecoder {
     }
 
     private JwtDecoder jwtDecoder() {
-        byte[] keyBytes = Decoders.BASE64.decode(this.secretKey);
-        SecretKey key = Keys.hmacShaKeyFor(keyBytes);
-        return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
+        return NimbusJwtDecoder.withJwkSetUri("http://localhost:8082/oauth2/jwks")
+                .build();
     }
 
     private JwtDecoder googleJwtDecoder() {
