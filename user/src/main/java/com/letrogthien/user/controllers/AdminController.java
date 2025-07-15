@@ -13,28 +13,28 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/kyc/admin")
+@RequestMapping("/api/v1/admin")
 
 public class AdminController {
     private final AdminService adminService;
     private final KycService kycService;
 
-    @PutMapping("approve-kyc")
+    @PutMapping("/kyc/approve-kyc")
     public ApiResponse<KycDto> approveKycDocument(UUID kycDocumentId) {
         return adminService.approveKycDocument(kycDocumentId);
     }
 
 
-    @PutMapping("reject-kyc")
+    @PutMapping("/kyc/reject-kyc")
     public ApiResponse<KycDto> rejectKycDocument(UUID kycDocumentId) {
         return adminService.rejectKycDocument(kycDocumentId);
     }
 
-    @GetMapping("/documents/status")
+    @GetMapping("/kyc/documents/status")
     public ApiResponse<List<KycDto>> getKycDocumentStatus(@RequestParam Status status) {
         return kycService.getAllByStatus(status);
     }
-    @GetMapping("/documents/user/{userId}")
+    @GetMapping("/kyc/documents/user/{userId}")
     public ApiResponse<List<KycDto>> getKycDocumentsByUserId(@PathVariable UUID userId) {
         return kycService.getAllByUserId(userId);
     }

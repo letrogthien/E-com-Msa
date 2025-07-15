@@ -47,7 +47,4 @@ public class KycController {
     public ApiResponse<KycDto> deleteKycDocumentPending(@JwtClaims("id") UUID userId) {
         return kycService.deleteKycDocumentPending(userId);
     }
-
-
-
 }
