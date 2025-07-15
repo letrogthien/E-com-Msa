@@ -4,41 +4,40 @@ import com.letrogthien.auth.common.RoleName;
 import com.letrogthien.auth.responses.ApiResponse;
 import com.letrogthien.auth.services.AdminService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/admin")
 @RequiredArgsConstructor
-@RequestMapping("/api/admin")
 public class AdminController {
+
     private final AdminService adminService;
 
-    @PostMapping("/approve-user")
-    public ApiResponse<String> approveUser(UUID userId) {
+    @PutMapping("/user/{userId}/approve")
+    public ApiResponse<String> approveUser(@PathVariable UUID userId) {
         return adminService.approveUser(userId);
     }
 
-    @PostMapping("/reject-user")
-    public ApiResponse<String> rejectUser(UUID userId) {
+    @PutMapping("/user/{userId}/reject")
+    public ApiResponse<String> rejectUser(@PathVariable UUID userId) {
         return adminService.rejectUser(userId);
     }
 
-    @PostMapping("/suspend-user")
-    public ApiResponse<String> suspendUser(UUID userId) {
+    @PutMapping("/user/{userId}/suspend")
+    public ApiResponse<String> suspendUser(@PathVariable UUID userId) {
         return adminService.suspendUser(userId);
     }
 
-    @PostMapping("/delete-user")
-    public ApiResponse<String> deleteUser(UUID userId) {
+    @DeleteMapping("/user/{userId}")
+    public ApiResponse<String> deleteUser(@PathVariable UUID userId) {
         return adminService.deleteUser(userId);
     }
 
-    @PostMapping("/set-role")
-    public ApiResponse<String> setRoleForUser(UUID userId, RoleName roleName) {
+    @PutMapping("/user/{userId}/role")
+    public ApiResponse<String> setRoleForUser(@PathVariable UUID userId,
+                                              @RequestParam RoleName roleName) {
         return adminService.setRoleForUser(userId, roleName);
     }
-
 }
