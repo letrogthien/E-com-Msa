@@ -2,6 +2,7 @@ package com.letrogthien.user.securities;
 
 
 
+import com.letrogthien.user.common.RoleName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,16 +32,12 @@ public class Security {
         security.authorizeHttpRequests(authorize ->
             authorize
                     .requestMatchers(
-                            "/api/v1/auth/login",
-                            "/api/v1/auth/register",
-                            "/api/v1/auth/verify-2fa",
-                            "/api/v1/search/user/name",
-                            "/api/v1/userCenter/forget-password",
-                            "/api/v1/user/**",
                             "/swagger-ui/**",
-                            "/v3/api-docs/**",
-                            "/api/v1/auth/activate"
+                            "/v3/api-docs/**"
                     ).permitAll()
+                    .requestMatchers(
+                            "api/v1/admin/**"
+                    ).hasAuthority(RoleName.ROLE_ADMIN.name())
                     .anyRequest().authenticated()
         );
     }
