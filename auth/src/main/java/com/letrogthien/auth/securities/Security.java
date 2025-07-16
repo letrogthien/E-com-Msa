@@ -42,10 +42,10 @@ public class Security {
                             "/swagger-ui/**",
                             "/v3/api-docs/**",
                             "/api/v1/auth/activate",
-                            "/api/v1/auth/test"
+                            "/api/v1/auth/test",
+                            "api/v1/oauth2/jwks"
                     ).permitAll()
-                    .requestMatchers("/api/admin/**").hasAuthority(RoleName.ROLE_ADMIN.name())
-                    .requestMatchers("/api/v1/auth/test-authenticated").hasAuthority(RoleName.ROLE_USER.name())
+                    .requestMatchers("/api/v1/admin/**").hasAuthority(RoleName.ROLE_ADMIN.name())
                     .anyRequest().authenticated()
         );
     }
