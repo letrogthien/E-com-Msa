@@ -19,10 +19,6 @@ public interface UserMapper {
             target = "roleNames",
             source = "roles",
             qualifiedByName = {"mapRolesToRoleNames"}
-    ), @Mapping(
-            target = "kycStatus",
-            source = "kycDocuments",
-            qualifiedByName = {"mapKycDocumentsToStatus"}
     )})
     UserDto toDTO(User user);
 
