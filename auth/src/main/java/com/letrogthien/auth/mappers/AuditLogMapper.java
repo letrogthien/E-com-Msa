@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface AuditLogMapper {
     @Mapping(
-            source = "user.id",
+            source = "userId",
             target = "userId"
     )
     AuditLogDto toDTO(AuditLog auditLog);

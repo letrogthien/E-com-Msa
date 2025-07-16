@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("api/v1/admin")
 @RequiredArgsConstructor
 public class AdminController {
 
