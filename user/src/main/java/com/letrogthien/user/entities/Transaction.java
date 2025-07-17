@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 
 @Entity
@@ -25,7 +26,7 @@ public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
@@ -56,9 +57,6 @@ public class Transaction {
 
     @PrePersist
     protected void onCreate() {
-        if (id == null) {
-            this.id = java.util.UUID.randomUUID().toString();
-        }
         this.createdAt = LocalDateTime.now();
     }
 
