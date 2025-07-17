@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "seller_ratings")
@@ -17,7 +18,7 @@ public class SellerRating {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", referencedColumnName = "id", nullable = false)
@@ -42,9 +43,6 @@ public class SellerRating {
 
     @PrePersist
     protected void onCreate() {
-        if (id == null) {
-            this.id = java.util.UUID.randomUUID().toString();
-        }
         this.createdAt = LocalDateTime.now();
     }
 }

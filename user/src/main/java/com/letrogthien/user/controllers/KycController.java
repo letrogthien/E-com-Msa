@@ -47,4 +47,19 @@ public class KycController {
     public ApiResponse<KycDto> deleteKycDocumentPending(@JwtClaims("id") UUID userId) {
         return kycService.deleteKycDocumentPending(userId);
     }
+
+    @GetMapping("test/permit")
+    public ApiResponse<String> test() {
+        return ApiResponse.<String>builder()
+                .data("KYC Service is running")
+                .message("Test successful")
+                .build();
+    }
+    @GetMapping("test/authen")
+    public ApiResponse<String> testAuthen(@JwtClaims("id") UUID userId) {
+        return ApiResponse.<String>builder()
+                .data("Authenticated user ID: " + userId)
+                .message("Authentication successful")
+                .build();
+    }
 }

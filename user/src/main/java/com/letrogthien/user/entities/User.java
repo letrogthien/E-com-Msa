@@ -21,7 +21,6 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "display_name", nullable = false, length = 50)
@@ -34,6 +33,7 @@ public class User {
     private String country;
 
     @Column(name = "status", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @Column(name = "avatar_url", length = 255)
