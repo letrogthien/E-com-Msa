@@ -4,7 +4,7 @@ spring:
       ddl-auto: update
     show-sql: true
   datasource:
-    url: jdbc:mysql://localhost:3306/app_db
+    url: jdbc:mysql://localhost:3306/user_service
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver

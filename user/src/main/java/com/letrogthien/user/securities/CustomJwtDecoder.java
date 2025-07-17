@@ -21,8 +21,6 @@ import java.text.ParseException;
 @Service
 @RequiredArgsConstructor
 public class CustomJwtDecoder implements JwtDecoder {
-    @Value("${security.secret.tokens.access_token.secret}")
-    private String secretKey;
 
     public Jwt decode(String token) throws JwtException {
         try {
