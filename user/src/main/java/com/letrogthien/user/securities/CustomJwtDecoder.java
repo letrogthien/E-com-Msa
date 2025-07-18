@@ -4,18 +4,12 @@ import com.letrogthien.user.exceptions.CustomException;
 import com.letrogthien.user.exceptions.ErrorCode;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Service;
-
-import javax.crypto.SecretKey;
 import java.text.ParseException;
 
 @Service
@@ -39,7 +33,7 @@ public class CustomJwtDecoder implements JwtDecoder {
     }
 
     private JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withJwkSetUri("http://localhost:8082/oauth2/jwks")
+        return NimbusJwtDecoder.withJwkSetUri("http://localhost:8082/api/v1/oauth2/jwks")
                 .build();
     }
 
