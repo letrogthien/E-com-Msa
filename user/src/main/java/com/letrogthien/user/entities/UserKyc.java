@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user_verifications")
@@ -19,7 +20,7 @@ public class UserKyc {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
@@ -58,9 +59,6 @@ public class UserKyc {
 
     @PrePersist
     protected void onCreate() {
-        if (id == null) {
-            this.id = java.util.UUID.randomUUID().toString();
-        }
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.setVerificationStatus(Status.PENDING);

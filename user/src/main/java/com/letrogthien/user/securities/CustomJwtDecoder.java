@@ -16,7 +16,6 @@ import java.text.ParseException;
 @RequiredArgsConstructor
 public class CustomJwtDecoder implements JwtDecoder {
 
-
     public Jwt decode(String token) throws JwtException {
         try {
             JWT jwt = JWTParser.parse(token);

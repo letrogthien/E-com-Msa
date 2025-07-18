@@ -34,7 +34,8 @@ public class Security {
             authorize
                     .requestMatchers(
                             "/swagger-ui/**",
-                            "/v3/api-docs/**"
+                            "/v3/api-docs/**",
+                            "api/v1/kyc/test/permit"
                     ).permitAll()
                     .requestMatchers(
                             "api/v1/admin/**"
