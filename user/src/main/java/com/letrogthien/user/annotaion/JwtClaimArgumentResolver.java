@@ -25,7 +25,7 @@ public class JwtClaimArgumentResolver implements HandlerMethodArgumentResolver {
 
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         JwtClaims jwtClaim = parameter.getParameterAnnotation(JwtClaims.class);
-
+        System.out.println("calling JwtClaimArgumentResolver");
         assert jwtClaim != null;
 
         String claimName = jwtClaim.value();
@@ -46,6 +46,7 @@ public class JwtClaimArgumentResolver implements HandlerMethodArgumentResolver {
     private Object convertClaimValue(String claimName, Object claimValue, Class<?> targetType) {
         if ("id".equals(claimName)) {
             try {
+                System.out.println("hmmm?");
                 return UUID.fromString((String) claimValue);
             } catch (IllegalArgumentException var5) {
                 throw new CustomException(ErrorCode.INVALID_CLAIM);
