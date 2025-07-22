@@ -12,7 +12,6 @@ import com.letrogthien.user.repositories.DeleteKycRepository;
 import com.letrogthien.user.repositories.KycRepository;
 import com.letrogthien.user.repositories.UserRepository;
 import com.letrogthien.user.responses.ApiResponse;
-import com.letrogthien.user.services.FileStorageService;
 import com.letrogthien.user.services.KycService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

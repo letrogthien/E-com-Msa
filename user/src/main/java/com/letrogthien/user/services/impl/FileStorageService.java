@@ -1,4 +1,4 @@
-package com.letrogthien.user.services;
+package com.letrogthien.user.services.impl;
 
 import com.letrogthien.user.exceptions.CustomException;
 import com.letrogthien.user.exceptions.ErrorCode;
