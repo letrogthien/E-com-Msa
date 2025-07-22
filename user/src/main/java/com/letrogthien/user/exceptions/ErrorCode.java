@@ -19,7 +19,8 @@ public enum ErrorCode {
     KYC_ALREADY_REJECTED("USER_031", "rejected",HttpStatus.BAD_REQUEST ),
     KYC_NOT_APPROVED("USER_032", "not approved", HttpStatus.BAD_REQUEST),
     INVALID_STATUS("USER_033", "invalid status",HttpStatus.BAD_REQUEST ),
-    FILE_UPLOAD_FAILED("USER_034","up load fail" , HttpStatus.BAD_REQUEST);
+    FILE_UPLOAD_FAILED("USER_034","up load fail" , HttpStatus.BAD_REQUEST),
+    BUYER_NOT_PARTICIPATED_IN_TRANSACTION("USER_035", "buyer not participated in this transaction", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;
