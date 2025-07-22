@@ -16,6 +16,9 @@ public enum Status {
     VERIFIED,
     NONE,
     SUCCESS,
+    SUBMITTED,
+    NEED_MORE_INFO,
+    DRAFT,
     RETRY,;
 
 

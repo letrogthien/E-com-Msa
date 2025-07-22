@@ -1,13 +1,14 @@
 package com.letrogthien.user.services.impl;
 
 import com.letrogthien.user.dtos.UserDto;
+import com.letrogthien.user.entities.Preference;
 import com.letrogthien.user.entities.User;
 import com.letrogthien.user.exceptions.CustomException;
 import com.letrogthien.user.exceptions.ErrorCode;
 import com.letrogthien.user.mappers.UserMapper;
+import com.letrogthien.user.repositories.PreferenceRepository;
 import com.letrogthien.user.repositories.UserRepository;
 import com.letrogthien.user.responses.ApiResponse;
-import com.letrogthien.user.services.FileStorageService;
 import com.letrogthien.user.services.UserCenterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,10 +22,18 @@ public class UserCenterServiceImpl implements UserCenterService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final FileStorageService fileStorageService;
+    private final PreferenceRepository preferenceRepository;
 
 
     @Override
     public ApiResponse<UserDto> getUserProfile(UUID userId) {
+        Preference preference = preferenceRepository.findByUserId(userId)
+                .orElse(null);
+        if (preference!=null && preference.isPrivacyPublicProfile()){
+            return ApiResponse.<UserDto>builder()
+                    .message("User profile is private")
+                    .build();
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
         UserDto userDto = userMapper.toDto(user);

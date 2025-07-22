@@ -20,4 +20,5 @@ public interface SellerRatingRepository extends JpaRepository<SellerRating, UUID
 
     @Query("SELECT AVG(sr.ratingScore) FROM SellerRating sr WHERE sr.seller.id = :sellerId")
     Double findAverageScoreBySellerId(@Param("sellerId") UUID sellerId);
+
 }

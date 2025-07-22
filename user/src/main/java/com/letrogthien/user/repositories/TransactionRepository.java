@@ -9,4 +9,5 @@ import java.util.UUID;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
     // Custom query methods can be defined here if needed
+    boolean existsByUserIdAndId(UUID userId, UUID id);
 }

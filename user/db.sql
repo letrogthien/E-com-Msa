@@ -107,3 +107,20 @@ CREATE TABLE billing_address
     created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+CREATE TABLE seller_applications
+(
+    id                 binary(16) NOT NULL DEFAULT (uuid_to_bin(uuid())) PRIMARY KEY,
+    user_id            binary(16) DEFAULT NULL,
+    application_status VARCHAR(30) NOT NULL, -- e.g., 'PENDING', 'APPROVED', 'REJECTED', 'DRAFT', 'SUBMITTED', 'NEEDS_MORE_INFO'
+    submission_date    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    review_date        TIMESTAMP NULL,
+    reviewer_id        binary(16) DEFAULT NULL,
+    rejection_reason   TEXT,
+    notes              TEXT,
+    created_at         TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    updated_at         TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    INDEX              idx_user_id (user_id),
+    INDEX              idx_application_status (application_status)
+);
