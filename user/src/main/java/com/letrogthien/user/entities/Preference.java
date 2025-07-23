@@ -24,11 +24,13 @@ public class Preference {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
+
     @Column(name = "notification_email", nullable = false)
-    private boolean notificationEmail = true;
+    private boolean notificationEmail ;
+
 
     @Column(name = "notification_push", nullable = false)
-    private boolean notificationPush = true;
+    private boolean notificationPush;
 
     @Column(name = "preferred_currency", length = 10)
     private String preferredCurrency;
@@ -38,13 +40,15 @@ public class Preference {
     private Platform preferredPlatform;
 
     @Column(name = "privacy_public_profile", nullable = false)
-    private boolean privacyPublicProfile = true;
+    private boolean privacyPublicProfile ;
 
+   
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
+
 
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {

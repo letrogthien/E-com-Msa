@@ -46,10 +46,10 @@ public class User {
     private String sellerBio;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
@@ -59,13 +59,13 @@ public class User {
     private Preference preferences;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Transaction> transactions = new HashSet<>();
+    private Set<Transaction> transactions;
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<SellerRating> sellerRatingsAsSeller = new HashSet<>();
+    private Set<SellerRating> sellerRatingsAsSeller;
 
     @OneToMany(mappedBy = "buyer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<SellerRating> sellerRatingsAsBuyer = new HashSet<>();
+    private Set<SellerRating> sellerRatingsAsBuyer;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @PrimaryKeyJoinColumn
@@ -73,11 +73,15 @@ public class User {
 
     @PrePersist
     protected void onCreate() {
+        this.updatedAt = LocalDateTime.now();               
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
         this.status = Status.ACTIVE;
         this.isSeller = false;
-        this.avatarUrl= "https://example.com/default-avatar.png"; // Default avatar URL
+        this.sellerRatingsAsSeller = new HashSet<>();
+        this.sellerRatingsAsBuyer = new HashSet<>();
+        this.transactions = new HashSet<>();
+        this.deletedAt = null;
+        this.avatarUrl = "https://example.com/default-avatar.png"; // Default avatar URL
     }
 
     @PreUpdate

@@ -8,6 +8,8 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
+
+    @Mapping(target = "isSeller", source = "seller")
     UserDto toDto(User user);
 
     @Mapping(target = "id", ignore = true)

@@ -4,8 +4,7 @@ import com.letrogthien.user.common.Status;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -19,8 +18,7 @@ import java.util.UUID;
 public class SellerApplication {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @Column(name = "id", updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne
