@@ -12,7 +12,6 @@ import com.letrogthien.user.repositories.UserRepository;
 import com.letrogthien.user.responses.ApiResponse;
 import com.letrogthien.user.services.PreferenceService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.web.webauthn.management.UserCredentialRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
