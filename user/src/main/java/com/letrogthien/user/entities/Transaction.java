@@ -50,14 +50,15 @@ public class Transaction {
     private Status status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<SellerRating> sellerRatings = new HashSet<>();
+    private Set<SellerRating> sellerRatings;
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        this.sellerRatings = new HashSet<>();
     }
 
 }

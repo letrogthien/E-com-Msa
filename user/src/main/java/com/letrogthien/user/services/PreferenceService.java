@@ -4,7 +4,6 @@ package com.letrogthien.user.services;
 import com.letrogthien.user.common.Platform;
 import com.letrogthien.user.dtos.PreferenceDto;
 import com.letrogthien.user.responses.ApiResponse;
-
 import java.util.UUID;
 
 public interface PreferenceService {
