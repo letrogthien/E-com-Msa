@@ -1,11 +1,14 @@
 package com.letrogthien.product.mapper;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import com.letrogthien.product.dto.CategoryDto;
 import com.letrogthien.product.entities.Category;
+import com.letrogthien.product.request.CategoryRequest;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
@@ -18,5 +21,9 @@ public interface CategoryMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    Category toEntity(com.letrogthien.product.request.CategoryRequest request);
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "iconUrl", ignore = true)
+    Category toEntity(CategoryRequest request);
+
+    List<CategoryDto> toDtoList(List<Category> categories);
 }

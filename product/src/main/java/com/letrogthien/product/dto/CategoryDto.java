@@ -3,6 +3,8 @@ package com.letrogthien.product.dto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.letrogthien.product.common.Status;
+
 import lombok.Data;
 
 
@@ -18,6 +20,7 @@ public class CategoryDto {
 
     private UUID parentId;
 
+    private Status status;
 
     private String description;
 

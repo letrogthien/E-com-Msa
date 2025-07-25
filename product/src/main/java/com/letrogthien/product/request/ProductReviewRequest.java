@@ -5,6 +5,7 @@ import java.util.UUID;
 
 @Data
 public class ProductReviewRequest {
+    private UUID id;
     private UUID productId;
     private UUID reviewerId;
     private int rating;
