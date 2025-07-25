@@ -9,7 +9,19 @@ import java.util.List;
 import java.util.UUID;
 
 public interface AdminService {
+    /**
+     * Approves a KYC document by its ID.
+     *
+     * @param kycDocumentId The UUID of the KYC document to approve.
+     * @return An ApiResponse containing the approved KycDto.
+     */
     ApiResponse<KycDto> approveKycDocument(UUID kycDocumentId);
+    /**
+     * Rejects a KYC document by its ID.
+     *
+     * @param kycDocumentId The UUID of the KYC document to reject.
+     * @return An ApiResponse containing the rejected KycDto.
+     */
     ApiResponse<KycDto> rejectKycDocument(UUID kycDocumentId);
 
     /**
