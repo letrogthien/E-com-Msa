@@ -58,7 +58,7 @@ CREATE TABLE products
     FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE RESTRICT, -- Prevent deleting categories with active products
     INDEX           idx_product_seller (seller_id),
     INDEX           idx_product_category (category_id),
-    INDEX           idx_product_status (product_status)
+    INDEX           idx_product_status (status)
 );
 
 -- `product_images`: Stores additional images for a product listing.
@@ -107,3 +107,59 @@ CREATE TABLE product_variants
     FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
     INDEX               idx_variant_product (product_id)
 );
+
+
+
+INSERT INTO categories (id, name, slug, parent_id, description, icon_url, status)
+VALUES 
+    (UUID_TO_BIN(UUID()), 'Digital Games', 'digital-games', NULL, 'Digital game products and services', '/icons/digital-games.png', 'ACTIVE'),
+    (UUID_TO_BIN(UUID()), 'Game Accounts', 'game-accounts', NULL, 'Gaming accounts for various platforms', '/icons/game-accounts.png', 'ACTIVE'),
+    (UUID_TO_BIN(UUID()), 'Virtual Items', 'virtual-items', NULL, 'In-game items and virtual goods', '/icons/virtual-items.png', 'ACTIVE'),
+    (UUID_TO_BIN(UUID()), 'Gaming Services', 'gaming-services', NULL, 'Professional gaming services', '/icons/gaming-services.png', 'ACTIVE');
+
+-- Store parent category IDs in variables for subcategories
+SET @digital_games_id = (SELECT id FROM categories WHERE slug = 'digital-games');
+SET @game_accounts_id = (SELECT id FROM categories WHERE slug = 'game-accounts');
+SET @virtual_items_id = (SELECT id FROM categories WHERE slug = 'virtual-items');
+SET @gaming_services_id = (SELECT id FROM categories WHERE slug = 'gaming-services');
+
+-- Insert subcategories
+INSERT INTO categories (id, name, slug, parent_id, description, icon_url, status)
+VALUES 
+    -- Digital Games subcategories
+    (UUID_TO_BIN(UUID()), 'Steam Games', 'steam-games', @digital_games_id, 'Steam platform games', '/icons/steam-games.png', 'ACTIVE'),
+    (UUID_TO_BIN(UUID()), 'Epic Games', 'epic-games', @digital_games_id, 'Epic Games platform products', '/icons/epic-games.png', 'ACTIVE'),
+    (UUID_TO_BIN(UUID()), 'Origin Games', 'origin-games', @digital_games_id, 'EA Origin platform games', '/icons/origin-games.png', 'ACTIVE'),
+
+    -- Game Accounts subcategories
+    (UUID_TO_BIN(UUID()), 'League of Legends', 'lol-accounts', @game_accounts_id, 'LoL game accounts', '/icons/lol-accounts.png', 'ACTIVE'),
+    (UUID_TO_BIN(UUID()), 'World of Warcraft', 'wow-accounts', @game_accounts_id, 'WoW game accounts', '/icons/wow-accounts.png', 'ACTIVE'),
+    (UUID_TO_BIN(UUID()), 'Valorant', 'valorant-accounts', @game_accounts_id, 'Valorant game accounts', '/icons/valorant-accounts.png', 'ACTIVE'),
+
+    -- Virtual Items subcategories
+    (UUID_TO_BIN(UUID()), 'CSGO Skins', 'csgo-skins', @virtual_items_id, 'Counter-Strike: Global Offensive items', '/icons/csgo-skins.png', 'ACTIVE'),
+    (UUID_TO_BIN(UUID()), 'LoL Skins', 'lol-skins', @virtual_items_id, 'League of Legends skins', '/icons/lol-skins.png', 'ACTIVE'),
+    (UUID_TO_BIN(UUID()), 'Dota 2 Items', 'dota2-items', @virtual_items_id, 'Dota 2 virtual items', '/icons/dota2-items.png', 'ACTIVE'),
+
+    -- Gaming Services subcategories
+    (UUID_TO_BIN(UUID()), 'Game Coaching', 'game-coaching', @gaming_services_id, 'Professional gaming coaching', '/icons/game-coaching.png', 'ACTIVE'),
+    (UUID_TO_BIN(UUID()), 'Power Leveling', 'power-leveling', @gaming_services_id, 'Character leveling services', '/icons/power-leveling.png', 'ACTIVE'),
+    (UUID_TO_BIN(UUID()), 'Boosting Services', 'boosting-services', @gaming_services_id, 'Competitive rank boosting', '/icons/boosting-services.png', 'ACTIVE');
+
+-- Insert category attributes for Game Accounts
+INSERT INTO category_attributes (id, category_id, attribute_name, attribute_type, is_required, status, options_json, validation_regex, display_order)
+VALUES
+    -- LoL Accounts attributes
+    (UUID_TO_BIN(UUID()), (SELECT id FROM categories WHERE slug = 'lol-accounts'), 'Server Region', 'ENUM', TRUE, 'ACTIVE', '["NA", "EU", "KR", "OCE"]', NULL, 1),
+    (UUID_TO_BIN(UUID()), (SELECT id FROM categories WHERE slug = 'lol-accounts'), 'Account Level', 'INTEGER', TRUE, 'ACTIVE', NULL, '^[1-9][0-9]*$', 2),
+    (UUID_TO_BIN(UUID()), (SELECT id FROM categories WHERE slug = 'lol-accounts'), 'Rank', 'ENUM', TRUE, 'ACTIVE', '["UNRANKED", "IRON", "BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "GRANDMASTER", "CHALLENGER"]', NULL, 3),
+    
+    -- WoW Accounts attributes
+    (UUID_TO_BIN(UUID()), (SELECT id FROM categories WHERE slug = 'wow-accounts'), 'Server Type', 'ENUM', TRUE, 'ACTIVE', '["PVE", "PVP", "RP", "RPPVP"]', NULL, 1),
+    (UUID_TO_BIN(UUID()), (SELECT id FROM categories WHERE slug = 'wow-accounts'), 'Character Level', 'INTEGER', TRUE, 'ACTIVE', NULL, '^[1-9][0-9]*$', 2),
+    (UUID_TO_BIN(UUID()), (SELECT id FROM categories WHERE slug = 'wow-accounts'), 'Expansion', 'ENUM', TRUE, 'ACTIVE', '["Classic", "TBC", "WOTLK", "Retail"]', NULL, 3),
+    
+    -- CSGO Skins attributes
+    (UUID_TO_BIN(UUID()), (SELECT id FROM categories WHERE slug = 'csgo-skins'), 'Wear', 'ENUM', TRUE, 'ACTIVE', '["Factory New", "Minimal Wear", "Field-Tested", "Well-Worn", "Battle-Scarred"]', NULL, 1),
+    (UUID_TO_BIN(UUID()), (SELECT id FROM categories WHERE slug = 'csgo-skins'), 'StatTrak', 'BOOLEAN', TRUE, 'ACTIVE', NULL, NULL, 2),
+    (UUID_TO_BIN(UUID()), (SELECT id FROM categories WHERE slug = 'csgo-skins'), 'Rarity', 'ENUM', TRUE, 'ACTIVE', '["Consumer Grade", "Industrial Grade", "Mil-Spec", "Restricted", "Classified", "Covert"]', NULL, 3);

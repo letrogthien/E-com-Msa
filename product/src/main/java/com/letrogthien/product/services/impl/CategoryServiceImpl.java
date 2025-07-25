@@ -58,14 +58,7 @@ public class CategoryServiceImpl implements CategoryService {
             .build();
     }
 
-    @Override
-    public ApiResponse<List<CategoryDto>> findCategoriesByAttribute(String attributeName, String attributeValue) {
-        List<Category> categories = categoryRepository.findByAttributeNameAndAttributeValue(attributeName, attributeValue);
-        return ApiResponse.<List<CategoryDto>>builder()
-            .data(categoryMapper.toDtoList(categories))
-            .message("Categories with " + attributeName + " = '" + attributeValue + "' retrieved successfully")
-            .build();
-    }
+
 
 
     
