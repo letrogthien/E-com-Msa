@@ -1,0 +1,7 @@
+
+@baseUrl = http://localhost:8084/api/v1
+
+### Categories
+
+
+GET {{baseUrl}}/category/ce002072-694e-11f0-87a8-0242ac120003

@@ -45,12 +45,5 @@ public interface CategoryService {
      */
     ApiResponse<List<CategoryDto>> findCategoriesByName(String name);
 
-    /**
-     * Finds categories by a specific attribute name and value.
-     *
-     * @param attributeName the name of the attribute
-     * @param attributeValue the value of the attribute
-     * @return a list of categories matching the attribute criteria
-     */
-    ApiResponse<List<CategoryDto>> findCategoriesByAttribute(String attributeName, String attributeValue);
+
 }

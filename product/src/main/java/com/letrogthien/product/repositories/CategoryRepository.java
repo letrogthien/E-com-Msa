@@ -14,5 +14,4 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
 
     List<Category> findByName(String name);
 
-    List<Category> findByAttributeNameAndAttributeValue(String attributeName, String attributeValue);
 }
