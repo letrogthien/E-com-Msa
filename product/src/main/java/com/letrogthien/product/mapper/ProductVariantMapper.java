@@ -2,6 +2,9 @@ package com.letrogthien.product.mapper;
 
 import com.letrogthien.product.entities.ProductVariant;
 import com.letrogthien.product.request.ProductVariantRequest;
+
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -20,12 +23,15 @@ public interface ProductVariantMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "sku", ignore = true)
-    @Mapping(target = "priceAdjustment", ignore = true)
-    @Mapping(target = "stockQuantity", ignore = true)
-    @Mapping(target = "thumbnailUrl", ignore = true)
+    @Mapping(target = "sku", source = "sku")
+    @Mapping(target = "priceAdjustment", source = "priceAdjustment")
+    @Mapping(target = "stockQuantity", source = "stockQuantity")
+    @Mapping(target = "thumbnailUrl", source = "thumbnailUrl")
+    @Mapping(target = "status", ignore = true)
     @Mapping(source = "variantAttributesJson", target = "variantAttributesJson")
     ProductVariant toEntity(ProductVariantRequest request);
+
+    List<ProductVariantDto> toDtoList(List<ProductVariant> all);
 
 
 }

@@ -11,6 +11,7 @@ CREATE TABLE categories
     parent_id   BINARY(16) NULL,              -- For nested categories (e.g., "Game Accounts" > "LoL Accounts")
     description TEXT,
     icon_url    VARCHAR(255),
+    status      VARCHAR(20) NOT NULL,
     created_at  TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (parent_id) REFERENCES categories (id) ON DELETE SET NULL,
@@ -26,6 +27,7 @@ CREATE TABLE category_attributes
     attribute_name    VARCHAR(100) NOT NULL, -- e.g., "Server", "Game Rank", "Character Name"
     attribute_type    VARCHAR(20)  NOT NULL, -- 'STRING', 'INTEGER', 'BOOLEAN', 'ENUM', 'TEXT'
     is_required       BOOLEAN      NOT NULL DEFAULT FALSE,
+    status            VARCHAR(20) NOT NULL,
     options_json      JSON NULL,             -- For 'ENUM' types, holds allowed values (e.g., ["NA", "EU", "ASIA"])
     validation_regex  VARCHAR(255),          -- Regex for input validation on the frontend/backend
     display_order     INT          NOT NULL DEFAULT 0, -- Order for displaying input fields
@@ -47,7 +49,8 @@ CREATE TABLE products
     price           DECIMAL(10, 2) NOT NULL,
     currency        VARCHAR(10)  NOT NULL, -- e.g., 'USD', 'EUR', 'VND'
     stock_quantity  INT          NOT NULL DEFAULT 1, -- Quantity available (0 for services/digital items sold once)
-    product_status  VARCHAR(50)  NOT NULL , -- 'DRAFT', 'PENDING_REVIEW', 'ACTIVE', 'SOLD_OUT', 'PAUSED', 'REJECTED'
+    status          VARCHAR(20) NOT NULL,
+    -- 'DRAFT', 'PENDING_REVIEW', 'ACTIVE', 'SOLD_OUT', 'PAUSED', 'REJECTED'
     thumbnail_url   VARCHAR(255), -- Main image for the listing
     details_json    JSON NULL,              -- **Key for dynamic attributes**: stores data for `category_attributes`
     created_at      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
@@ -64,6 +67,7 @@ CREATE TABLE product_images
     id          BINARY(16)   NOT NULL DEFAULT (UUID_TO_BIN(UUID())) PRIMARY KEY,
     product_id  BINARY(16)   NOT NULL,
     image_url   VARCHAR(255) NOT NULL,
+    status      VARCHAR(20) NOT NULL,
     display_order INT        NOT NULL DEFAULT 0, -- Order in which images are displayed
     created_at  TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
@@ -95,6 +99,7 @@ CREATE TABLE product_variants
     sku                 VARCHAR(100) NOT NULL UNIQUE, -- Unique Stock Keeping Unit for this variant
     price_adjustment    DECIMAL(10,2) NULL, -- Optional price difference from the base product price
     stock_quantity      INT          NOT NULL,
+    status      VARCHAR(20) NOT NULL,
     variant_attributes_json JSON NULL,         -- e.g., {"Color": "Red", "Size": "M", "Server": "EU"}
     thumbnail_url       VARCHAR(255), -- Specific image for this variant
     created_at          TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,

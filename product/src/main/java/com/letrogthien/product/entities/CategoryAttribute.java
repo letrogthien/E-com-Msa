@@ -4,13 +4,17 @@ package com.letrogthien.product.entities;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.letrogthien.product.common.Status;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,6 +49,9 @@ public class CategoryAttribute {
     @Column(columnDefinition = "JSON")
     private String optionsJson;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     private String validationRegex;
 
     private Integer displayOrder;
@@ -55,7 +62,13 @@ public class CategoryAttribute {
     @PrePersist
     protected void onCreate() {
         this.isRequired =  false ;
+        this.status = Status.ACTIVE;
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
 }

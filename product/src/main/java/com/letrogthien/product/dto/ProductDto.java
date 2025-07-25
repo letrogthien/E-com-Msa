@@ -2,6 +2,7 @@ package com.letrogthien.product.dto;
 
 import lombok.Data;
 import java.util.UUID;
+import com.letrogthien.product.common.Status;
 import java.math.BigDecimal;
 
 @Data
@@ -14,7 +15,7 @@ public class ProductDto {
     private BigDecimal price;
     private String currency;
     private int stockQuantity;
-    private String productStatus;
+    private Status status;
     private String thumbnailUrl;
     private String detailsJson;
 }

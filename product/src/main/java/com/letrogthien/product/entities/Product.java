@@ -55,7 +55,7 @@ public class Product {
 
     @Column(nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
-    private Status productStatus ;
+    private Status status ;
 
     private String thumbnailUrl;
 
