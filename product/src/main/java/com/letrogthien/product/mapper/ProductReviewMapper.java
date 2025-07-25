@@ -3,6 +3,8 @@ package com.letrogthien.product.mapper;
 import com.letrogthien.product.entities.ProductReview;
 import com.letrogthien.product.request.ProductReviewRequest;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -31,5 +33,7 @@ public interface ProductReviewMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "status", ignore = true)
     ProductReview toEntity(ProductReviewRequest request);
+
+    List<ProductReviewDto> toDtoList(List<ProductReview> all);
 
 }

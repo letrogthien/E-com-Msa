@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 @Data
 public class ProductRequest {
+    private UUID id;
     private UUID sellerId;
     private UUID categoryId;
     private String title;

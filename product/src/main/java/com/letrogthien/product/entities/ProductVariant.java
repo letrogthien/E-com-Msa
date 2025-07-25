@@ -2,9 +2,12 @@ package com.letrogthien.product.entities;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.letrogthien.product.common.Status;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -39,6 +42,10 @@ public class ProductVariant {
     @Column(nullable = false)
     private Integer stockQuantity;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+
     @Column(columnDefinition = "JSON")
     private String variantAttributesJson;
 
@@ -53,5 +60,6 @@ public class ProductVariant {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.stockQuantity = 0; 
+        this.status = Status.ACTIVE;
     }   
 }

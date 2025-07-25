@@ -3,6 +3,7 @@ package com.letrogthien.product.common;
 public enum RoleName {
     ROLE_USER,
     ROLE_ADMIN,
+    ROLE_SELLER,
     ROLE_MODERATOR,
     ROLE_SUPER_ADMIN,
     ROLE_GUEST,

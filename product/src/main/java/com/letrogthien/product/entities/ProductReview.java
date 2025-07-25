@@ -52,6 +52,7 @@ public class ProductReview {
     @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private Status status ;
+    
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

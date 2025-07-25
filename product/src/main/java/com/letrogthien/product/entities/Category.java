@@ -3,9 +3,12 @@ package com.letrogthien.product.entities;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.letrogthien.product.common.Status;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -44,12 +47,16 @@ public class Category {
 
     private String iconUrl;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
+        this.status = Status.ACTIVE;
         this.createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

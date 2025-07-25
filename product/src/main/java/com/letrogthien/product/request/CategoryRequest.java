@@ -5,9 +5,9 @@ import java.util.UUID;
 
 @Data
 public class CategoryRequest {
+    private UUID id;
     private String name;
     private String slug;
     private UUID parentId;
     private String description;
-    private String iconUrl;
 }
