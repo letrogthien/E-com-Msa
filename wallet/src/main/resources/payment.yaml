@@ -1,0 +1,14 @@
+vnpay:
+  vnpVersion: 2.1.0
+  vnpCommand: pay
+  vnpTmnCode: XTNKANRH
+  vnpHashSecret: FNABMOP7AXKQFVWBIZE63HEIW7NAHO96
+  vnpHashType: HmacSHA512
+  vnpReturnUrl: http://localhost:8085/api/v1/payment/vnpay_return
+  vnpBankCode: VNPAYQR
+  vnpPayUrl: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+
+payment:
+  jwt:
+    secret: KubnkvnS2x4wHHS4XKzUTTlG0IdlTydjtOn+qAitgHE=
+    expiration: 600000
